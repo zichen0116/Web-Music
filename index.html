@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>world.execute(me); - VS Code</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 启动屏幕 -->
+    <div id="launch-screen">
+        <canvas id="particles-canvas"></canvas>
+        <div class="launch-content">
+            <div class="vscode-logo">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                    <path fill="#0078d4" d="M95 20L75 10 35 45 15 30 5 35v30l10 5 20-15 40 35 20-10z"/>
+                    <path fill="#0065b8" d="M75 10L35 45v10l40 35 20-10V20z"/>
+                    <path fill="#1f9cf0" d="M35 45L15 30 5 35v30l10 5 20-15z"/>
+                </svg>
+            </div>
+            <h1 class="launch-title">world.execute(me);</h1>
+            <p class="launch-subtitle">A love story told in Python</p>
+            <div class="loading-container">
+                <div class="loading-bar">
+                    <div class="loading-progress" id="loading-progress"></div>
+                </div>
+                <p class="loading-text" id="loading-text">正在加载资源...</p>
+            </div>
+            <p class="launch-hint">点击任意位置或按空格键开始</p>
+        </div>
+        <div class="bg-particles"></div>
+    </div>
+
+    <!-- VS Code 主界面 -->
+    <div id="vscode-editor" class="hidden">
+        <!-- 标题栏 -->
+        <div class="titlebar">
+            <div class="titlebar-left">
+                <div class="titlebar-icon">
+                    <svg width="16" height="16" viewBox="0 0 100 100">
+                        <path fill="#0078d4" d="M95 20L75 10 35 45 15 30 5 35v30l10 5 20-15 40 35 20-10z"/>
+                    </svg>
+                </div>
+                <span class="titlebar-menu">File</span>
+                <span class="titlebar-menu">Edit</span>
+                <span class="titlebar-menu">View</span>
+                <span class="titlebar-menu">Run</span>
+                <span class="titlebar-menu">Help</span>
+            </div>
+            <div class="titlebar-center">
+                <span>world_execute_me.py - Web-Music - Visual Studio Code</span>
+            </div>
+            <div class="titlebar-right">
+                <button class="titlebar-btn minimize">─</button>
+                <button class="titlebar-btn maximize">□</button>
+                <button class="titlebar-btn close">×</button>
+            </div>
+        </div>
+
+        <!-- 主容器 -->
+        <div class="main-container">
+            <!-- 活动栏 -->
+            <div class="activity-bar">
+                <div class="activity-icon active" data-tooltip="资源管理器">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.5 0h-9L7 1.5V6H2.5L1 7.5v15.07L2.5 24h12.07L16 22.57V18h4.7l1.3-1.43V4.5L17.5 0zm0 2.12l2.38 2.38H17.5V2.12zm-3 20.38h-12v-15H7v9.07L8.5 18h6v4.5zm6-6h-12v-15H16V6h4.5v10.5z"/>
+                    </svg>
+                </div>
+                <div class="activity-icon" data-tooltip="搜索">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.25 0a8.25 8.25 0 0 0-6.18 13.72L1 22.88l1.12 1.12 8.05-9.12A8.251 8.251 0 1 0 15.25.01V0zm0 15a6.75 6.75 0 1 1 0-13.5 6.75 6.75 0 0 1 0 13.5z"/>
+                    </svg>
+                </div>
+                <div class="activity-icon" data-tooltip="源代码管理">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21.007 8.222A3.738 3.738 0 0 0 17.5 5.5a3.73 3.73 0 0 0-3.507 2.722 4.187 4.187 0 0 0-2.68 1.673 4.21 4.21 0 0 0-.756 2.408 3.73 3.73 0 0 0-3.507 2.722A3.738 3.738 0 0 0 3.5 18.5a3.75 3.75 0 0 0 7.236 1.375 4.187 4.187 0 0 0 2.68-1.673 4.21 4.21 0 0 0 .756-2.408A3.73 3.73 0 0 0 17.5 13a3.738 3.738 0 0 0 3.507-4.778zM7.25 20.5a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5zm10.25-9a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5z"/>
+                    </svg>
+                </div>
+                <div class="activity-icon" data-tooltip="运行和调试">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.5 12a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0zm1.5 0a7 7 0 1 0-14 0 7 7 0 0 0 14 0zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+                    </svg>
+                </div>
+                <div class="activity-icon" data-tooltip="扩展">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13.5 1.5L15 0h7.5L24 1.5V9l-1.5 1.5H15L13.5 9V1.5zm1.5 0V9h7.5V1.5H15zM0 15l1.5-1.5H9L10.5 15v7.5L9 24H1.5L0 22.5V15zm1.5 0v7.5H9V15H1.5zm0-13.5L0 3v7.5L1.5 12H9l1.5-1.5V3L9 1.5H1.5zm0 1.5H9v7.5H1.5V3zm13.5 12l-1.5 1.5V24l1.5 1.5H22.5L24 24v-7.5l-1.5-1.5H15zm0 1.5h7.5V24H15v-7.5z"/>
+                    </svg>
+                </div>
+                <div class="activity-spacer"></div>
+                <div class="activity-icon" data-tooltip="设置">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19.85 8.75l4.15.83v4.84l-4.15.83 2.35 3.52-3.43 3.43-3.52-2.35-.83 4.15H9.58l-.83-4.15-3.52 2.35-3.43-3.43 2.35-3.52L0 13.42V8.58l4.15-.83L1.8 4.23 5.23 1.8l3.52 2.35L9.58 0h4.84l.83 4.15 3.52-2.35 3.43 3.43-2.35 3.52zM12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">资源管理器</span>
+                </div>
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <span class="section-arrow">▼</span>
+                        <span class="section-title">WEB-MUSIC</span>
+                    </div>
+                    <div class="file-tree">
+                        <div class="tree-item folder open">
+                            <span class="tree-icon">📁</span>
+                            <span class="tree-name">src</span>
+                        </div>
+                        <div class="tree-item file active" style="padding-left: 24px;">
+                            <span class="tree-icon">🐍</span>
+                            <span class="tree-name">world_execute_me.py</span>
+                        </div>
+                        <div class="tree-item file" style="padding-left: 24px;">
+                            <span class="tree-icon">🐍</span>
+                            <span class="tree-name">love.py</span>
+                        </div>
+                        <div class="tree-item file" style="padding-left: 24px;">
+                            <span class="tree-icon">🐍</span>
+                            <span class="tree-name">heart.py</span>
+                        </div>
+                        <div class="tree-item folder">
+                            <span class="tree-icon">📁</span>
+                            <span class="tree-name">assets</span>
+                        </div>
+                        <div class="tree-item file" style="padding-left: 24px;">
+                            <span class="tree-icon">🎵</span>
+                            <span class="tree-name">world_execute_me.wav</span>
+                        </div>
+                        <div class="tree-item file">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-name">README.md</span>
+                        </div>
+                        <div class="tree-item file">
+                            <span class="tree-icon">⚙️</span>
+                            <span class="tree-name">requirements.txt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 编辑器区域 -->
+            <div class="editor-container">
+                <!-- 标签页 -->
+                <div class="tabs-bar">
+                    <div class="tab active">
+                        <span class="tab-icon">🐍</span>
+                        <span class="tab-name">world_execute_me.py</span>
+                        <span class="tab-close">×</span>
+                    </div>
+                    <div class="tab">
+                        <span class="tab-icon">🐍</span>
+                        <span class="tab-name">love.py</span>
+                        <span class="tab-close">×</span>
+                    </div>
+                </div>
+
+                <!-- 面包屑 -->
+                <div class="breadcrumbs">
+                    <span class="breadcrumb">src</span>
+                    <span class="breadcrumb-separator">›</span>
+                    <span class="breadcrumb">world_execute_me.py</span>
+                    <span class="breadcrumb-separator">›</span>
+                    <span class="breadcrumb symbol">World</span>
+                </div>
+
+                <!-- 代码编辑器 -->
+                <div class="code-editor" id="code-editor">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <div class="code-content" id="code-content"></div>
+                    <div class="minimap" id="minimap"></div>
+                </div>
+
+                <!-- 终端面板 -->
+                <div class="terminal-panel">
+                    <div class="terminal-header">
+                        <div class="terminal-tabs">
+                            <span class="terminal-tab active">终端</span>
+                            <span class="terminal-tab">问题</span>
+                            <span class="terminal-tab">输出</span>
+                            <span class="terminal-tab">调试控制台</span>
+                        </div>
+                        <div class="terminal-actions">
+                            <button class="terminal-btn" id="clear-terminal">🗑️</button>
+                            <button class="terminal-btn" id="toggle-terminal">▼</button>
+                        </div>
+                    </div>
+                    <div class="terminal-content" id="terminal-content">
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">Python 3.11.0 (main) [GCC 11.2.0] on linux</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">Type "help", "copyright", "credits" or "license" for more information.</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">&gt;&gt;&gt;</span>
+                            <span class="terminal-cursor">|</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 状态栏 -->
+        <div class="statusbar">
+            <div class="statusbar-left">
+                <span class="status-item branch">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21 3a3 3 0 0 0-3 3c0 1.29.81 2.39 1.94 2.82-.16 1.62-.72 2.92-1.68 3.89-1.02 1.03-2.44 1.65-4.26 1.83V8.82A3 3 0 0 0 12 3a3 3 0 0 0-2.06 5.18 3 3 0 0 0 .06.64v6.36c-1.82-.18-3.24-.8-4.26-1.83-.96-.97-1.52-2.27-1.68-3.89A3.005 3.005 0 0 0 6 6.5 3 3 0 0 0 0 6.5a3 3 0 0 0 5.18 2.06 3 3 0 0 0 .64-.06c.18 1.98.87 3.63 2.06 4.82 1.26 1.26 3.06 2.05 5.12 2.26v2.1A3 3 0 0 0 12 21a3 3 0 1 0 2-5.18 3 3 0 0 0-.06-.64v-2.1c2.06-.21 3.86-1 5.12-2.26 1.19-1.19 1.88-2.84 2.06-4.82a3 3 0 0 0 .64.06A3.005 3.005 0 0 0 24 6a3 3 0 0 0-3-3z"/> 
+                    </svg>
+                    main
+                </span>
+                <span class="status-item sync">⟳ 0 ↓ 0 ↑</span>
+                <span class="status-item errors">✕ 0 ⚠ 0</span>
+            </div>
+            <div class="statusbar-center">
+                <span class="status-item playback" id="playback-status">
+                    <span class="play-icon">▶</span>
+                    <span class="status-text">准备就绪</span>
+                </span>
+                <span class="status-item time" id="playback-time">00:00 / 00:00</span>
+            </div>
+            <div class="statusbar-right">
+                <span class="status-item line-col" id="line-col">Ln 1, Col 1</span>
+                <span class="status-item spaces">Spaces: 4</span>
+                <span class="status-item encoding">UTF-8</span>
+                <span class="status-item eol">LF</span>
+                <span class="status-item language">Python</span>
+                <span class="status-item theme-toggle" id="theme-toggle">🌙</span>
+            </div>
+        </div>
+
+        <!-- 音频可视化 -->
+        <canvas id="audio-visualizer" class="audio-visualizer"></canvas>
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="control-panel" id="control-panel">
+        <div class="progress-container">
+            <input type="range" class="progress-bar" id="progress-bar" min="0" max="100" value="0">
+        </div>
+        <div class="controls">
+            <button class="control-btn" id="play-btn">
+                <span class="play-icon">▶</span>
+            </button>
+            <button class="control-btn" id="stop-btn">
+                <span class="stop-icon">⬛</span>
+            </button>
+            <div class="volume-container">
+                <span class="volume-icon" id="volume-icon">🔊</span>
+                <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="80">
+            </div>
+            <button class="control-btn" id="fullscreen-btn">
+                <span class="fullscreen-icon">⛶</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 音频元素 -->
+    <audio id="audio" preload="auto">
+        <source src="assets/audio/world_execute_me.wav" type="audio/wav">
+        <source src="assets/audio/world_execute_me.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Matrix 代码雨背景 -->
+    <canvas id="matrix-canvas" class="matrix-canvas"></canvas>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
