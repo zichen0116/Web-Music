@@ -110,12 +110,12 @@ if __name__ == "__main__":
 
 // ==================== Terminal Output Timeline ====================
 const terminalOutputs = [
-    { time: 0, text: ">>> python world_execute_me.py", type: "prompt" },
+    { time: 0, text: ">>> python Sunyz.py", type: "prompt" },
     { time: 2, text: "=" + "=".repeat(48), type: "output" },
     { time: 2.5, text: "世界，执行我！", type: "output" },
     { time: 3, text: "=" + "=".repeat(48), type: "output" },
     { time: 4, text: "你好，我是 程序员", type: "output" },
-    { time: 6, text: "🌍 world.execute(me);", type: "success" },
+    { time: 6, text: "🌍 开始懂了;", type: "success" },
     { time: 7, text: "正在加载梦想引擎...", type: "output" },
     { time: 9, text: "✨ 正在追逐: 创造美好的代码", type: "success" },
     { time: 12, text: "✨ 正在追逐: 用技术改变世界", type: "success" },
