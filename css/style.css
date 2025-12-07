@@ -523,15 +523,46 @@ body {
 }
 
 /* Syntax Highlighting */
-.keyword { color: #569cd6; } /* Python keywords: def, class, import, from, return, if, else, for, while, etc. */
-.string { color: #ce9178; } /* Strings */
-.comment { color: #6a9955; font-style: italic; } /* Comments */
-.function { color: #dcdcaa; } /* Function names */
-.class-name { color: #4ec9b0; } /* Class names */
-.number { color: #b5cea8; } /* Numbers */
-.operator { color: #d4d4d4; } /* Operators */
-.decorator { color: #c586c0; } /* Python decorators */
-.builtin { color: #4fc1ff; } /* Built-in functions like print, len, etc. */
+.keyword { color: #569cd6; }
+.string { color: #ce9178; }
+.comment { color: #6a9955; font-style: italic; }
+.function { color: #dcdcaa; }
+.class-name { color: #4ec9b0; }
+.number { color: #b5cea8; }
+.operator { color: #d4d4d4; }
+.decorator { color: #c586c0; }
+.builtin { color: #4fc1ff; }
+
+/* Lyrics Display */
+.lyric-text {
+    color: #d4d4d4;
+    font-size: 16px;
+    line-height: 2;
+    display: block;
+    padding: 8px 0;
+    animation: lyricFadeIn 0.5s ease-in;
+}
+
+@keyframes lyricFadeIn {
+    from { 
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.code-line .lyric-text {
+    color: #cccccc;
+}
+
+.code-line.active .lyric-text {
+    color: #ffffff;
+    font-weight: 500;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
 
 /* Cursor */
 .cursor {
