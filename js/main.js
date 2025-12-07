@@ -347,8 +347,8 @@ function startCodeTyping() {
 
 // ==================== Syntax Highlighting ====================
 function highlightSyntax(code) {
-    // Python keywords
-    const keywords = ['def', 'class', 'import', 'from', 'return', 'if', 'elif', 'else', 
+    // Python keywords (excluding def and class which are handled specially)
+    const keywords = ['import', 'from', 'return', 'if', 'elif', 'else', 
                      'for', 'while', 'in', 'try', 'except', 'finally', 'with', 'as', 
                      'break', 'continue', 'pass', 'raise', 'yield', 'lambda', 'True', 
                      'False', 'None', 'and', 'or', 'not', 'is'];
@@ -357,9 +357,10 @@ function highlightSyntax(code) {
                      'set', 'tuple', 'type', 'isinstance', 'enumerate', 'zip', 'map', 
                      'filter', 'open', 'time'];
     
-    // Escape HTML
+    // Escape HTML first
     code = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     
+    // Process in order: comments and strings first (to avoid processing their contents)
     // Comments
     code = code.replace(/(#.*$)/gm, '<span class="comment">$1</span>');
     
@@ -370,26 +371,27 @@ function highlightSyntax(code) {
     // Decorators
     code = code.replace(/(@\w+)/g, '<span class="decorator">$1</span>');
     
-    // Class names (capture words after 'class' keyword, before they're wrapped)
-    code = code.replace(/\bclass\s+(\w+)/g, 'class <span class="class-name">$1</span>');
+    // Class definitions with names (def and class keywords get highlighted here)
+    code = code.replace(/\bclass\s+(\w+)/g, '<span class="keyword">class</span> <span class="class-name">$1</span>');
     
-    // Function names (capture words after 'def' keyword, before they're wrapped)
-    code = code.replace(/\bdef\s+(\w+)/g, 'def <span class="function">$1</span>');
+    // Function definitions with names
+    code = code.replace(/\bdef\s+(\w+)/g, '<span class="keyword">def</span> <span class="function">$1</span>');
     
-    // Keywords (must be after class/function name extraction to avoid double-wrapping)
+    // Other keywords (avoiding already-wrapped content by using negative lookbehind for span)
     keywords.forEach(keyword => {
-        const regex = new RegExp(`\\b${keyword}\\b`, 'g');
+        // Use a more specific pattern that avoids matching inside already-highlighted content
+        const regex = new RegExp(`(?<!<span[^>]*>)\\b${keyword}\\b(?![^<]*</span>)`, 'g');
         code = code.replace(regex, `<span class="keyword">${keyword}</span>`);
     });
     
     // Builtins
     builtins.forEach(builtin => {
-        const regex = new RegExp(`\\b${builtin}\\b`, 'g');
+        const regex = new RegExp(`(?<!<span[^>]*>)\\b${builtin}\\b(?![^<]*</span>)`, 'g');
         code = code.replace(regex, `<span class="builtin">${builtin}</span>`);
     });
     
     // Numbers
-    code = code.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
+    code = code.replace(/(?<!<span[^>]*>)\b(\d+)\b(?![^<]*<\/span>)/g, '<span class="number">$1</span>');
     
     return code;
 }
