@@ -4,36 +4,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>开始懂了 - 孙燕姿 - VS Code</title>
+    <title>Beginning To Understand - VS Code</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='%230078d4' d='M95 20L75 10 35 45 15 30 5 35v30l10 5 20-15 40 35 20-10z'/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=SF+Pro+Display:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <!-- 启动屏幕 -->
+    <!-- Mac 桌面启动屏幕 -->
     <div id="launch-screen">
-        <canvas id="particles-canvas"></canvas>
-        <div class="launch-content">
-            <div class="vscode-logo">
-                <svg width="100" height="100" viewBox="0 0 100 100">
-                    <path fill="#0078d4" d="M95 20L75 10 35 45 15 30 5 35v30l10 5 20-15 40 35 20-10z" />
-                    <path fill="#0065b8" d="M75 10L35 45v10l40 35 20-10V20z" />
-                    <path fill="#1f9cf0" d="M35 45L15 30 5 35v30l10 5 20-15z" />
-                </svg>
+        <!-- Mac 壁纸背景 -->
+        <div class="mac-wallpaper"></div>
+        
+        <!-- Mac 顶部菜单栏 -->
+        <div class="mac-menubar">
+            <div class="menubar-left">
+                <span class="apple-logo"></span>
+                <span class="menu-item active">Finder</span>
+                <span class="menu-item">File</span>
+                <span class="menu-item">Edit</span>
+                <span class="menu-item">View</span>
+                <span class="menu-item">Go</span>
+                <span class="menu-item">Window</span>
+                <span class="menu-item">Help</span>
             </div>
-            <h1 class="launch-title">开始懂了</h1>
-            <p class="launch-subtitle">孙燕姿 - Beginning To Understand</p>
-            <div class="loading-container">
-                <div class="loading-bar">
-                    <div class="loading-progress" id="loading-progress"></div>
-                </div>
-                <p class="loading-text" id="loading-text">正在加载资源...</p>
+            <div class="menubar-right">
+                <span class="menubar-icon">🔋</span>
+                <span class="menubar-icon">📶</span>
+                <span class="menubar-icon">🔍</span>
+                <span class="menubar-time" id="mac-time">12:00</span>
             </div>
-            <p class="launch-hint">点击任意位置或按空格键开始</p>
         </div>
-        <div class="bg-particles"></div>
+
+        <!-- 桌面图标 -->
+        <div class="desktop-icons">
+            <div class="desktop-icon">
+                <div class="icon-image">📁</div>
+                <span class="icon-label">Documents</span>
+            </div>
+            <div class="desktop-icon">
+                <div class="icon-image">🎵</div>
+                <span class="icon-label">Music</span>
+            </div>
+            <div class="desktop-icon">
+                <div class="icon-image">🖼️</div>
+                <span class="icon-label">Pictures</span>
+            </div>
+        </div>
+
+        <!-- VS Code 打开窗口动画 -->
+        <div class="vscode-window-container" id="vscode-window-container">
+            <div class="vscode-opening-window" id="vscode-opening-window">
+                <div class="window-titlebar">
+                    <div class="window-buttons">
+                        <span class="window-btn close"></span>
+                        <span class="window-btn minimize"></span>
+                        <span class="window-btn maximize"></span>
+                    </div>
+                    <span class="window-title">Visual Studio Code</span>
+                </div>
+                <div class="window-content">
+                    <div class="vscode-splash">
+                        <div class="vscode-logo-large icon-vscode"></div>
+                        <h2 class="splash-title">Visual Studio Code</h2>
+                        <div class="splash-loading">
+                            <div class="splash-progress-bar">
+                                <div class="splash-progress" id="loading-progress"></div>
+                            </div>
+                            <p class="splash-text" id="loading-text">正在加载...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mac Dock 栏 -->
+        <div class="mac-dock">
+            <div class="dock-item" data-tooltip="Finder">
+                <div class="dock-icon icon-finder"></div>
+            </div>
+            <div class="dock-item" data-tooltip="Launchpad">
+                <div class="dock-icon">🚀</div>
+            </div>
+            <div class="dock-item" data-tooltip="Safari">
+                <div class="dock-icon icon-safari"></div>
+            </div>
+            <div class="dock-item" data-tooltip="Mail">
+                <div class="dock-icon">✉️</div>
+            </div>
+            <div class="dock-item" data-tooltip="Music">
+                <div class="dock-icon">🎵</div>
+            </div>
+            <div class="dock-divider"></div>
+            <div class="dock-item vscode-dock" id="vscode-dock-icon" data-tooltip="Visual Studio Code">
+                <div class="dock-icon icon-vscode"></div>
+                <div class="dock-indicator"></div>
+            </div>
+            <div class="dock-item" data-tooltip="Terminal">
+                <div class="dock-icon">💻</div>
+            </div>
+            <div class="dock-divider"></div>
+            <div class="dock-item" data-tooltip="Trash">
+                <div class="dock-icon">🗑️</div>
+            </div>
+        </div>
+
+        <!-- 点击提示 -->
+        <div class="click-hint" id="click-hint">
+            <div class="hint-arrow">👆</div>
+            <p>点击 VS Code 图标开始</p>
+        </div>
     </div>
 
     <!-- VS Code 主界面 -->
@@ -41,11 +123,7 @@
         <!-- 标题栏 -->
         <div class="titlebar">
             <div class="titlebar-left">
-                <div class="titlebar-icon">
-                    <svg width="16" height="16" viewBox="0 0 100 100">
-                        <path fill="#0078d4" d="M95 20L75 10 35 45 15 30 5 35v30l10 5 20-15 40 35 20-10z" />
-                    </svg>
-                </div>
+                <div class="titlebar-icon icon-vscode"></div>
                 <span class="titlebar-menu">File</span>
                 <span class="titlebar-menu">Edit</span>
                 <span class="titlebar-menu">Selection</span>
@@ -56,7 +134,7 @@
                 <span class="titlebar-menu">Help</span>
             </div>
             <div class="titlebar-center">
-                <span>lyrics.lrc - Web-Music - Visual Studio Code</span>
+                <span>lyrics.py - Web-Music - Visual Studio Code</span>
             </div>
             <div class="titlebar-right">
                 <button class="titlebar-btn minimize">─</button>
@@ -87,10 +165,9 @@
                             d="M21.007 8.222A3.738 3.738 0 0 0 17.5 5.5a3.73 3.73 0 0 0-3.507 2.722 4.187 4.187 0 0 0-2.68 1.673 4.21 4.21 0 0 0-.756 2.408 3.73 3.73 0 0 0-3.507 2.722A3.738 3.738 0 0 0 3.5 18.5a3.75 3.75 0 0 0 7.236 1.375 4.187 4.187 0 0 0 2.68-1.673 4.21 4.21 0 0 0 .756-2.408A3.73 3.73 0 0 0 17.5 13a3.738 3.738 0 0 0 3.507-4.778zM7.25 20.5a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5zm10.25-9a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5z" />
                     </svg>
                 </div>
-                <div class="activity-icon" data-tooltip="运行和调试">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M17.5 12a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0zm1.5 0a7 7 0 1 0-14 0 7 7 0 0 0 14 0zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+                <div class="activity-icon play-control" id="play-control-btn" data-tooltip="运行和调试 (播放/暂停)">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="play-icon-svg">
+                        <path class="play-path" d="M8 5v14l11-7z" />
                     </svg>
                 </div>
                 <div class="activity-icon" data-tooltip="扩展">
@@ -121,31 +198,31 @@
                     <div class="file-tree">
                         <div class="tree-item folder open">
                             <span class="tree-icon">📁</span>
+                            <span class="tree-name">src</span>
+                        </div>
+                        <div class="tree-item folder open level-1">
+                            <span class="tree-icon">📁</span>
+                            <span class="tree-name">music</span>
+                        </div>
+                        <div class="tree-item file active level-2">
+                            <span class="tree-icon">🐍</span>
+                            <span class="tree-name">lyrics.py</span>
+                        </div>
+                        <div class="tree-item file level-2">
+                            <span class="tree-icon">🐍</span>
+                            <span class="tree-name">player.py</span>
+                        </div>
+                        <div class="tree-item folder">
+                            <span class="tree-icon">📁</span>
                             <span class="tree-name">assets</span>
                         </div>
-                        <div class="tree-item folder open" style="padding-left: 24px;">
-                            <span class="tree-icon">📁</span>
-                            <span class="tree-name">audio</span>
-                        </div>
-                        <div class="tree-item file active" style="padding-left: 48px;">
-                            <span class="tree-icon">🎵</span>
-                            <span class="tree-name">lyrics.lrc</span>
-                        </div>
-                        <div class="tree-item file" style="padding-left: 48px;">
-                            <span class="tree-icon">🎵</span>
-                            <span class="tree-name">music.mp3</span>
-                        </div>
                         <div class="tree-item folder">
                             <span class="tree-icon">📁</span>
-                            <span class="tree-name">css</span>
-                        </div>
-                        <div class="tree-item folder">
-                            <span class="tree-icon">📁</span>
-                            <span class="tree-name">js</span>
+                            <span class="tree-name">utils</span>
                         </div>
                         <div class="tree-item file">
-                            <span class="tree-icon">📄</span>
-                            <span class="tree-name">index.html</span>
+                            <span class="tree-icon">🐍</span>
+                            <span class="tree-name">main.py</span>
                         </div>
                         <div class="tree-item file">
                             <span class="tree-icon">📄</span>
@@ -160,19 +237,19 @@
                 <!-- 标签页 -->
                 <div class="tabs-bar">
                     <div class="tab active">
-                        <span class="tab-icon">🎵</span>
-                        <span class="tab-name">lyrics.lrc</span>
+                        <span class="tab-icon">🐍</span>
+                        <span class="tab-name">lyrics.py</span>
                         <span class="tab-close">×</span>
                     </div>
                 </div>
 
                 <!-- 面包屑 -->
                 <div class="breadcrumbs">
-                    <span class="breadcrumb">assets</span>
+                    <span class="breadcrumb">src</span>
                     <span class="breadcrumb-separator">›</span>
-                    <span class="breadcrumb">audio</span>
+                    <span class="breadcrumb">music</span>
                     <span class="breadcrumb-separator">›</span>
-                    <span class="breadcrumb">lyrics.lrc</span>
+                    <span class="breadcrumb">lyrics.py</span>
                 </div>
 
                 <!-- 代码编辑器 -->
@@ -237,7 +314,7 @@
                 <span class="status-item spaces">Spaces: 4</span>
                 <span class="status-item encoding">UTF-8</span>
                 <span class="status-item eol">LF</span>
-                <span class="status-item language">LRC</span>
+                <span class="status-item language">Python</span>
                 <span class="status-item theme-toggle" id="theme-toggle">🌙</span>
             </div>
         </div>
@@ -246,38 +323,12 @@
         <canvas id="audio-visualizer" class="audio-visualizer"></canvas>
     </div>
 
-    <!-- 控制面板 -->
-    <div class="control-panel" id="control-panel">
-        <div class="progress-container">
-            <input type="range" class="progress-bar" id="progress-bar" min="0" max="100" value="0">
-        </div>
-        <div class="controls">
-            <button class="control-btn" id="play-btn">
-                <span class="play-icon">▶</span>
-            </button>
-            <button class="control-btn" id="stop-btn">
-                <span class="stop-icon">⬛</span>
-            </button>
-            <div class="volume-container">
-                <span class="volume-icon" id="volume-icon">🔊</span>
-                <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="80">
-            </div>
-            <button class="control-btn" id="fullscreen-btn">
-                <span class="fullscreen-icon">⛶</span>
-            </button>
-        </div>
-    </div>
-
     <!-- 音频元素 -->
     <audio id="audio" preload="auto" crossorigin="anonymous">
         <source src="assets/audio/music.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Matrix 代码雨背景 -->
-    <canvas id="matrix-canvas" class="matrix-canvas"></canvas>
-
     <script src="js/lrc-parser.js"></script>
-    <script src="js/matrix-rain.js"></script>
     <script src="js/main.js"></script>
 </body>
 

@@ -1,6 +1,6 @@
 /* 
  * VS Code Style Music Visualizer
- * Dark+ Theme with Enhanced Visual Effects
+ * Mac Desktop Theme with Enhanced Visual Effects
  */
 
 /* ==================== Global Styles ==================== */
@@ -34,7 +34,7 @@
 }
 
 body {
-    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Fira Code', 'Consolas', 'Monaco', monospace;
     background: var(--bg-primary);
     color: var(--text-primary);
     overflow: hidden;
@@ -46,115 +46,407 @@ body {
     display: none !important;
 }
 
-/* ==================== Launch Screen ==================== */
+/* ==================== Mac Desktop Launch Screen ==================== */
 #launch-screen {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 10000;
-    animation: gradientShift 10s ease infinite;
+    overflow: hidden;
 }
 
-@keyframes gradientShift {
+/* Mac Wallpaper */
+.mac-wallpaper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop') no-repeat center/cover;
+}
+
+@keyframes wallpaperShift {
     0%, 100% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
 }
 
-#particles-canvas {
+/* Mac Menu Bar */
+.mac-menubar {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 25px;
+    background: rgba(0, 0, 0, 0.25);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    z-index: 10002;
+    font-size: 13px;
+    color: #fff;
+    font-weight: 500;
 }
 
-.launch-content {
-    text-align: center;
-    z-index: 10001;
+.menubar-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.apple-logo::before {
+    content: '';
+    font-size: 16px;
+}
+
+.menu-item {
+    cursor: default;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.menu-item.active {
+    font-weight: 600;
+}
+
+.menubar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.menubar-icon {
+    font-size: 14px;
+    cursor: default;
+}
+
+.menubar-time {
+    font-weight: 500;
+}
+
+/* Desktop Icons */
+.desktop-icons {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.desktop-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.desktop-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.icon-image {
+    font-size: 48px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.icon-label {
+    color: #fff;
+    font-size: 12px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    font-weight: 500;
+}
+
+/* Mac Dock */
+.mac-dock {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 10002;
+}
+
+.dock-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
     position: relative;
 }
 
-.vscode-logo svg {
-    filter: drop-shadow(0 0 30px rgba(0, 120, 212, 0.8));
-    animation: pulse 2s ease-in-out infinite;
+.dock-item:hover {
+    transform: translateY(-10px) scale(1.2);
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-}
-
-.launch-title {
-    font-size: 3.5rem;
-    font-weight: 600;
-    color: #ffffff;
-    margin: 30px 0 10px;
-    text-shadow: 0 0 20px rgba(0, 212, 255, 0.8), 0 0 40px rgba(189, 0, 255, 0.5);
-    animation: neonGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes neonGlow {
-    from { text-shadow: 0 0 20px rgba(0, 212, 255, 0.8), 0 0 40px rgba(189, 0, 255, 0.5); }
-    to { text-shadow: 0 0 30px rgba(0, 212, 255, 1), 0 0 60px rgba(189, 0, 255, 0.8); }
-}
-
-.launch-subtitle {
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 40px;
-}
-
-.loading-container {
-    margin: 30px 0;
-}
-
-.loading-bar {
-    width: 400px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-    overflow: hidden;
-    margin: 0 auto 10px;
-}
-
-.loading-progress {
-    height: 100%;
-    background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-    width: 0%;
-    transition: width 0.3s ease;
-    box-shadow: 0 0 10px var(--neon-blue);
-}
-
-.loading-text {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.9rem;
-}
-
-.launch-hint {
-    margin-top: 20px;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.95rem;
-    animation: blink 2s ease-in-out infinite;
-}
-
-@keyframes blink {
-    0%, 50%, 100% { opacity: 1; }
-    25%, 75% { opacity: 0.5; }
-}
-
-.bg-particles {
+.dock-item:hover::before {
+    content: attr(data-tooltip);
     position: absolute;
-    width: 100%;
-    height: 100%;
+    top: -35px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.dock-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.2s;
+}
+
+.dock-icon.vscode-icon {
+    background: linear-gradient(135deg, #0078d4, #00a8e8);
+    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.4);
+}
+
+.dock-icon.finder-icon {
+    background: linear-gradient(135deg, #1e90ff, #00bfff);
+    position: relative;
+}
+
+.finder-face::before {
+    content: '😊';
+    font-size: 32px;
+}
+
+/* VS Code Icon Image */
+.icon-vscode {
+    background: url('https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg') no-repeat center/contain;
+}
+
+.icon-finder {
+    background: url('https://upload.wikimedia.org/wikipedia/commons/c/c9/Finder_Icon_macOS_Big_Sur.png') no-repeat center/contain;
+}
+
+.icon-safari {
+    background: url('https://upload.wikimedia.org/wikipedia/commons/5/52/Safari_browser_logo.svg') no-repeat center/contain;
+}
+
+.dock-indicator {
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    margin-top: 2px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.dock-item.active .dock-indicator {
+    opacity: 1;
+}
+
+.dock-divider {
+    width: 1px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 0 8px;
+}
+
+/* VS Code Dock Bounce Animation */
+.dock-item.vscode-dock.bouncing .dock-icon {
+    animation: dockBounce 0.5s ease-in-out 3;
+}
+
+@keyframes dockBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* VS Code Opening Window */
+.vscode-window-container {
+    position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.vscode-window-container.visible {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.vscode-opening-window {
+    width: 600px;
+    height: 400px;
+    background: #1e1e1e;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     overflow: hidden;
+    transform: scale(0.1) translateY(300px);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.vscode-opening-window.opening {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.vscode-opening-window.fullscreen {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    transition: all 0.5s ease;
+}
+
+.window-titlebar {
+    height: 35px;
+    background: #323233;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    position: relative;
+}
+
+.window-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.window-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.window-btn.close { background: #ff5f57; }
+.window-btn.minimize { background: #ffbd2e; }
+.window-btn.maximize { background: #28ca41; }
+
+.window-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: #ccc;
+    font-weight: 500;
+}
+
+.window-content {
+    height: calc(100% - 35px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1e1e1e;
+}
+
+.vscode-splash {
+    text-align: center;
+}
+
+.vscode-logo-large {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    filter: drop-shadow(0 0 20px rgba(0, 120, 212, 0.6));
+}
+
+.splash-title {
+    color: #fff;
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 30px;
+}
+
+.splash-loading {
+    width: 300px;
+}
+
+.splash-progress-bar {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.splash-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #0078d4, #00a8e8);
+    width: 0%;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px #0078d4;
+}
+
+.splash-text {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+}
+
+/* Click Hint */
+.click-hint {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: #fff;
+    z-index: 10003;
+    animation: hintPulse 2s ease-in-out infinite;
+}
+
+.click-hint.hidden {
+    display: none;
+}
+
+.hint-arrow {
+    font-size: 30px;
+    animation: hintBounce 1s ease-in-out infinite;
+}
+
+@keyframes hintBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes hintPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.click-hint p {
+    font-size: 14px;
+    margin-top: 5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* ==================== VS Code Interface ==================== */
@@ -175,6 +467,7 @@ body {
     justify-content: space-between;
     padding: 0 10px;
     border-bottom: 1px solid var(--border-color);
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -185,6 +478,8 @@ body {
 }
 
 .titlebar-icon {
+    width: 16px;
+    height: 16px;
     display: flex;
     align-items: center;
     margin-right: 5px;
@@ -282,6 +577,52 @@ body {
     background: var(--accent-blue);
 }
 
+/* Play Control Button */
+.activity-icon.play-control {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.activity-icon.play-control:hover {
+    color: var(--accent-blue);
+    transform: scale(1.1);
+}
+
+.activity-icon.play-control.playing {
+    color: var(--accent-blue);
+    animation: playingPulse 2s ease-in-out infinite;
+}
+
+.activity-icon.play-control.playing::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 35px;
+    background: var(--accent-blue);
+    box-shadow: 0 0 10px var(--accent-blue);
+}
+
+@keyframes playingPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Pause icon path (hidden by default) */
+.pause-path {
+    display: none;
+}
+
+.activity-icon.play-control.playing .play-path {
+    display: none;
+}
+
+.activity-icon.play-control.playing .pause-path {
+    display: block;
+}
+
 .activity-icon[data-tooltip]:hover::after {
     content: attr(data-tooltip);
     position: absolute;
@@ -332,6 +673,7 @@ body {
     align-items: center;
     padding: 5px 15px;
     cursor: pointer;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -377,6 +719,10 @@ body {
 .tree-name {
     flex: 1;
 }
+
+/* Tree item indentation levels */
+.tree-item.level-1 { padding-left: 24px; }
+.tree-item.level-2 { padding-left: 48px; }
 
 /* ==================== Editor Container ==================== */
 .editor-container {
@@ -470,33 +816,41 @@ body {
     flex: 1;
     display: flex;
     background: var(--bg-primary);
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
     font-family: 'Fira Code', 'Consolas', monospace;
     font-size: 14px;
     line-height: 1.6;
+    scroll-behavior: smooth;
 }
 
 .line-numbers {
     width: 50px;
+    min-width: 50px;
     background: var(--bg-primary);
     color: var(--line-number-color);
     text-align: right;
     padding: 10px 10px 10px 5px;
+    -webkit-user-select: none;
     user-select: none;
     border-right: 1px solid var(--border-color);
+    position: sticky;
+    left: 0;
 }
 
 .line-number {
     display: block;
-    height: 22.4px;
+    height: 24px;
     font-size: 13px;
+    line-height: 24px;
 }
 
 .code-content {
     flex: 1;
     padding: 10px 15px;
-    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
     font-family: 'Fira Code', 'Consolas', monospace;
     position: relative;
     min-height: 100%;
@@ -504,64 +858,74 @@ body {
 
 .code-line {
     position: relative;
-    min-height: 22.4px;
-    line-height: 22.4px;
+    min-height: 24px;
+    line-height: 24px;
 }
 
 .code-line.active {
-    background: var(--active-line-bg);
+    background: rgba(0, 122, 204, 0.2);
+    border-left: 3px solid var(--accent-blue);
+    padding-left: 10px;
+    margin-left: -3px;
+    box-shadow: inset 0 0 20px rgba(0, 122, 204, 0.1);
+}
+
+.code-line.active .string {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    font-weight: 500;
 }
 
 .code-line.typing {
-    animation: lineHighlight 0.5s ease-in-out;
+    animation: pythonTyping 0.8s ease-out;
 }
 
-@keyframes lineHighlight {
-    0% { background: transparent; }
-    50% { background: rgba(0, 122, 204, 0.15); }
-    100% { background: transparent; }
-}
-
-/* Syntax Highlighting */
-.keyword { color: #569cd6; }
-.string { color: #ce9178; }
-.comment { color: #6a9955; font-style: italic; }
-.function { color: #dcdcaa; }
-.class-name { color: #4ec9b0; }
-.number { color: #b5cea8; }
-.operator { color: #d4d4d4; }
-.decorator { color: #c586c0; }
-.builtin { color: #4fc1ff; }
-
-/* Lyrics Display */
-.lyric-text {
-    color: #d4d4d4;
-    font-size: 16px;
-    line-height: 2;
-    display: block;
-    padding: 8px 0;
-    animation: lyricFadeIn 0.5s ease-in;
-}
-
-@keyframes lyricFadeIn {
-    from { 
+@keyframes pythonTyping {
+    0% { 
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateX(-20px);
+        background: rgba(0, 212, 255, 0.3);
     }
-    to { 
+    30% {
         opacity: 1;
-        transform: translateY(0);
+        background: rgba(0, 122, 204, 0.2);
+    }
+    100% { 
+        opacity: 1;
+        transform: translateX(0);
+        background: transparent;
     }
 }
 
-.code-line .lyric-text {
-    color: #cccccc;
+/* Syntax Highlighting - Python Style */
+.keyword { color: #c586c0; font-weight: 500; }  /* Python keywords: def, class, import, from, return */
+.string { color: #ce9178; }  /* Strings */
+.comment { color: #6a9955; font-style: italic; }  /* Comments */
+.function { color: #dcdcaa; }  /* Function names */
+.class-name { color: #4ec9b0; font-weight: 500; }  /* Class names */
+.number { color: #b5cea8; }  /* Numbers */
+.operator { color: #d4d4d4; }  /* Operators */
+.decorator { color: #d7ba7d; }  /* Decorators like @property */
+.builtin { color: #4fc1ff; }  /* Built-in functions like print */
+.variable { color: #9cdcfe; }  /* Variables */
+.indent { color: transparent; -webkit-user-select: none; user-select: none; }  /* Indentation */
+
+/* Python Code Display Enhancements */
+.code-line {
+    position: relative;
+    min-height: 24px;
+    line-height: 24px;
+    padding: 2px 0;
+    border-radius: 3px;
+    transition: background 0.2s ease;
 }
 
-.code-line.active .lyric-text {
-    color: #ffffff;
-    font-weight: 500;
-    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+.code-line.header-line {
+    opacity: 0.9;
+}
+
+.code-line:hover {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 /* Cursor */
@@ -754,151 +1118,6 @@ body {
     z-index: 100;
 }
 
-/* ==================== Control Panel ==================== */
-.control-panel {
-    position: fixed;
-    bottom: 22px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 15px 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.control-panel.visible {
-    opacity: 1;
-}
-
-.progress-container {
-    margin-bottom: 15px;
-}
-
-.progress-bar {
-    width: 400px;
-    height: 4px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: var(--bg-secondary);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-}
-
-.progress-bar::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    background: var(--accent-blue);
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 0 8px rgba(0, 122, 204, 0.6);
-}
-
-.progress-bar::-moz-range-thumb {
-    width: 12px;
-    height: 12px;
-    background: var(--accent-blue);
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 0 8px rgba(0, 122, 204, 0.6);
-}
-
-.controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    justify-content: center;
-}
-
-.control-btn {
-    width: 40px;
-    height: 40px;
-    background: var(--accent-blue);
-    border: none;
-    border-radius: 50%;
-    color: #ffffff;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s, transform 0.1s;
-}
-
-.control-btn:hover {
-    background: var(--accent-blue-hover);
-    transform: scale(1.05);
-}
-
-.control-btn:active {
-    transform: scale(0.95);
-}
-
-.volume-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.volume-icon {
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.volume-slider {
-    width: 100px;
-    height: 4px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: var(--bg-secondary);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-}
-
-.volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 10px;
-    height: 10px;
-    background: var(--accent-blue);
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.volume-slider::-moz-range-thumb {
-    width: 10px;
-    height: 10px;
-    background: var(--accent-blue);
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-}
-
-/* ==================== Matrix Canvas ==================== */
-.matrix-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 50;
-    transition: opacity 1s ease;
-}
-
-.matrix-canvas.active {
-    opacity: 0.15;
-}
-
 /* ==================== Light Theme ==================== */
 body.light-theme {
     --bg-primary: #ffffff;
@@ -1059,10 +1278,7 @@ body.light-theme {
 
 /* ==================== Print Styles ==================== */
 @media print {
-    #launch-screen,
-    .control-panel,
-    .audio-visualizer,
-    .matrix-canvas {
+    #launch-screen {
         display: none !important;
     }
 }

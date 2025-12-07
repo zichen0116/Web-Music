@@ -1,6 +1,6 @@
 /**
  * VS Code Style Music Visualizer
- * Interactive web experience with Python code typing animation
+ * Mac Desktop Theme with Python Code Animation
  */
 
 // ==================== Global State ====================
@@ -14,12 +14,13 @@ const state = {
     isDarkTheme: true,
     currentLyricIndex: -1,
     isInitialized: false,
+    isAudioLoaded: false,
+    isLyricsLoaded: false,
     lrcParser: null,
-    matrixRain: null
+    pythonLineIndex: 0,
+    terminalOutputShown: false,
+    windowOpened: false
 };
-
-// ==================== Lyrics Data ====================
-// Will be loaded from lyrics.lrc file
 
 // ==================== Terminal Output Timeline ====================
 const terminalOutputs = [
@@ -47,30 +48,34 @@ function init() {
         loadingText: document.getElementById('loading-text'),
         codeContent: document.getElementById('code-content'),
         lineNumbers: document.getElementById('line-numbers'),
+        codeEditor: document.getElementById('code-editor'),
         terminalContent: document.getElementById('terminal-content'),
         audio: document.getElementById('audio'),
         playbackStatus: document.getElementById('playback-status'),
         playbackTime: document.getElementById('playback-time'),
         lineCol: document.getElementById('line-col'),
-        playBtn: document.getElementById('play-btn'),
-        stopBtn: document.getElementById('stop-btn'),
-        progressBar: document.getElementById('progress-bar'),
-        volumeSlider: document.getElementById('volume-slider'),
-        volumeIcon: document.getElementById('volume-icon'),
-        fullscreenBtn: document.getElementById('fullscreen-btn'),
+        playControlBtn: document.getElementById('play-control-btn'),
         themeToggle: document.getElementById('theme-toggle'),
-        controlPanel: document.getElementById('control-panel'),
         audioVisualizer: document.getElementById('audio-visualizer'),
-        matrixCanvas: document.getElementById('matrix-canvas'),
-        particlesCanvas: document.getElementById('particles-canvas'),
         clearTerminal: document.getElementById('clear-terminal'),
-        toggleTerminal: document.getElementById('toggle-terminal')
+        toggleTerminal: document.getElementById('toggle-terminal'),
+        // Mac Desktop Elements
+        vscodeDockIcon: document.getElementById('vscode-dock-icon'),
+        vscodeWindowContainer: document.getElementById('vscode-window-container'),
+        vscodeOpeningWindow: document.getElementById('vscode-opening-window'),
+        clickHint: document.getElementById('click-hint'),
+        macTime: document.getElementById('mac-time')
     };
+    
+    // Update Mac time
+    updateMacTime();
+    setInterval(updateMacTime, 1000);
     
     // Initialize audio
     if (elements.audio) {
         elements.audio.volume = state.volume;
         elements.audio.addEventListener('loadedmetadata', onAudioLoaded);
+        elements.audio.addEventListener('canplaythrough', onAudioCanPlay);
         elements.audio.addEventListener('timeupdate', onTimeUpdate);
         elements.audio.addEventListener('ended', onAudioEnded);
         elements.audio.addEventListener('error', onAudioError);
@@ -79,83 +84,38 @@ function init() {
     // Set up event listeners
     setupEventListeners();
     
-    // Show loading animation
-    showLoadingAnimation();
-    
-    // Initialize visual effects
-    initParticles();
-    initMatrixRain();
-    initAudioVisualizer();
-    
     // Load lyrics
     loadLyrics();
+    
+    // Preload audio
+    if (elements.audio) {
+        elements.audio.load();
+    }
 }
 
-// ==================== Loading Animation ====================
-function showLoadingAnimation() {
-    let progress = 0;
-    const loadingInterval = setInterval(() => {
-        progress += Math.random() * 15;
-        if (progress >= 100) {
-            progress = 100;
-            clearInterval(loadingInterval);
-            elements.loadingProgress.style.width = '100%';
-            elements.loadingText.textContent = '加载完成！';
-            setTimeout(() => {
-                state.isInitialized = true;
-            }, 500);
-        } else {
-            elements.loadingProgress.style.width = progress + '%';
-            const messages = [
-                '正在加载资源...',
-                '初始化音频引擎...',
-                '准备代码编辑器...',
-                '加载主题配置...',
-                '即将完成...'
-            ];
-            const messageIndex = Math.min(Math.floor(progress / 20), messages.length - 1);
-            elements.loadingText.textContent = messages[messageIndex];
-        }
-    }, 200);
+// ==================== Mac Time Update ====================
+function updateMacTime() {
+    if (elements.macTime) {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        elements.macTime.textContent = `${hours}:${minutes}`;
+    }
 }
 
 // ==================== Event Listeners Setup ====================
 function setupEventListeners() {
-    // Launch screen click to start
-    if (elements.launchScreen) {
-        elements.launchScreen.addEventListener('click', startExperience);
+    // VS Code dock icon click
+    if (elements.vscodeDockIcon) {
+        elements.vscodeDockIcon.addEventListener('click', openVSCodeWindow);
     }
     
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyPress);
     
-    // Play button
-    if (elements.playBtn) {
-        elements.playBtn.addEventListener('click', togglePlay);
-    }
-    
-    // Stop button
-    if (elements.stopBtn) {
-        elements.stopBtn.addEventListener('click', stopPlayback);
-    }
-    
-    // Progress bar
-    if (elements.progressBar) {
-        elements.progressBar.addEventListener('input', seekAudio);
-    }
-    
-    // Volume controls
-    if (elements.volumeSlider) {
-        elements.volumeSlider.addEventListener('input', changeVolume);
-    }
-    
-    if (elements.volumeIcon) {
-        elements.volumeIcon.addEventListener('click', toggleMute);
-    }
-    
-    // Fullscreen button
-    if (elements.fullscreenBtn) {
-        elements.fullscreenBtn.addEventListener('click', toggleFullscreen);
+    // Play control button in activity bar
+    if (elements.playControlBtn) {
+        elements.playControlBtn.addEventListener('click', togglePlay);
     }
     
     // Theme toggle
@@ -171,9 +131,6 @@ function setupEventListeners() {
     if (elements.toggleTerminal) {
         elements.toggleTerminal.addEventListener('click', toggleTerminalPanel);
     }
-    
-    // Fullscreen change event
-    document.addEventListener('fullscreenchange', onFullscreenChange);
 }
 
 // ==================== Load Lyrics ====================
@@ -184,72 +141,216 @@ async function loadLyrics() {
         
         const metadata = state.lrcParser.getMetadata();
         console.log('Lyrics loaded:', metadata);
+        state.isLyricsLoaded = true;
         
-        // Display metadata in terminal
-        if (metadata.ti) {
-            addTerminalLine(`🎵 歌曲: ${metadata.ti}`, 'success');
-        }
-        if (metadata.ar) {
-            addTerminalLine(`🎤 歌手: ${metadata.ar}`, 'output');
-        }
+        checkLoadingComplete();
     } catch (error) {
         console.error('Failed to load lyrics:', error);
-        if (error.message && error.message.includes('fetch')) {
-            addTerminalLine('⚠️ 无法加载歌词文件，请检查文件路径', 'error');
-        } else {
-            addTerminalLine('⚠️ 歌词文件格式错误', 'error');
-        }
+        state.isLyricsLoaded = true; // Continue anyway
+        checkLoadingComplete();
     }
 }
 
-// ==================== Start Experience ====================
-function startExperience() {
-    if (!state.isInitialized) return;
+// ==================== Audio Loading ====================
+function onAudioCanPlay() {
+    state.isAudioLoaded = true;
+    checkLoadingComplete();
+}
+
+function checkLoadingComplete() {
+    if (state.isAudioLoaded && state.isLyricsLoaded) {
+        state.isInitialized = true;
+        console.log('All resources loaded');
+    }
+}
+
+// ==================== Open VS Code Window Animation ====================
+function openVSCodeWindow() {
+    if (state.windowOpened) return;
+    state.windowOpened = true;
     
-    // Hide launch screen
-    elements.launchScreen.classList.add('hidden');
+    // Hide click hint
+    if (elements.clickHint) {
+        elements.clickHint.classList.add('hidden');
+    }
     
-    // Show VS Code editor
-    elements.vscodeEditor.classList.remove('hidden');
+    // Add bounce animation to dock icon
+    elements.vscodeDockIcon.classList.add('bouncing');
+    elements.vscodeDockIcon.classList.add('active');
     
-    // Show control panel after a delay
+    // Show window container
+    elements.vscodeWindowContainer.classList.add('visible');
+    
+    // Start opening animation after bounce
     setTimeout(() => {
-        if (elements.controlPanel) {
-            elements.controlPanel.classList.add('visible');
+        elements.vscodeOpeningWindow.classList.add('opening');
+        
+        // Start loading animation
+        startLoadingAnimation();
+    }, 300);
+}
+
+// ==================== Loading Animation ====================
+function startLoadingAnimation() {
+    let progress = 0;
+    const loadingMessages = [
+        '正在初始化...',
+        '加载音频资源...',
+        '准备代码编辑器...',
+        '加载歌词文件...',
+        '配置主题...',
+        '即将完成...'
+    ];
+    
+    const loadingInterval = setInterval(() => {
+        progress += Math.random() * 12 + 3;
+        
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(loadingInterval);
+            
+            elements.loadingProgress.style.width = '100%';
+            elements.loadingText.textContent = '加载完成！';
+            
+            // Transition to full screen and then to VS Code
+            setTimeout(() => {
+                transitionToVSCode();
+            }, 500);
+        } else {
+            elements.loadingProgress.style.width = progress + '%';
+            const messageIndex = Math.min(Math.floor(progress / 18), loadingMessages.length - 1);
+            elements.loadingText.textContent = loadingMessages[messageIndex];
         }
-    }, 1000);
+    }, 150);
+}
+
+// ==================== Transition to VS Code ====================
+function transitionToVSCode() {
+    // Expand window to fullscreen
+    elements.vscodeOpeningWindow.classList.add('fullscreen');
     
-    // Start lyrics display
-    startLyricsDisplay();
-    
-    // Try to play audio (may require user interaction)
     setTimeout(() => {
-        playAudio();
-    }, 2000);
+        // Hide launch screen
+        elements.launchScreen.style.transition = 'opacity 0.5s ease';
+        elements.launchScreen.style.opacity = '0';
+        
+        setTimeout(() => {
+            elements.launchScreen.classList.add('hidden');
+            
+            // Show VS Code editor
+            elements.vscodeEditor.classList.remove('hidden');
+            
+            // Initialize visual effects
+            initAudioVisualizer();
+            
+            // Start lyrics display
+            startLyricsDisplay();
+            
+            // Auto play audio
+            setTimeout(() => {
+                console.log('Auto playing audio...');
+                playAudio();
+            }, 500);
+        }, 500);
+    }, 400);
 }
 
 // ==================== Lyrics Display ====================
+// Python syntax patterns for displaying lyrics - More variety
+const pythonPatterns = [
+    // Pattern 1: print function
+    (text, idx) => `<span class="builtin">print</span>(<span class="string">"${escapeHtml(text)}"</span>)`,
+    
+    // Pattern 2: Variable assignment
+    (text, idx) => `<span class="variable">lyric_${idx + 1}</span> <span class="operator">=</span> <span class="string">"${escapeHtml(text)}"</span>`,
+    
+    // Pattern 3: Function definition
+    (text, idx) => `<span class="keyword">def</span> <span class="function">verse_${idx + 1}</span>(): <span class="keyword">return</span> <span class="string">"${escapeHtml(text)}"</span>`,
+    
+    // Pattern 4: f-string print with emoji
+    (text, idx) => `<span class="builtin">print</span>(<span class="string">f"🎵 ${escapeHtml(text)}"</span>)`,
+    
+    // Pattern 5: List append
+    (text, idx) => `<span class="variable">lyrics</span>.<span class="function">append</span>(<span class="string">"${escapeHtml(text)}"</span>)`,
+    
+    // Pattern 6: Class attribute
+    (text, idx) => `<span class="keyword">class</span> <span class="class-name">Verse${idx + 1}</span>: <span class="variable">text</span> <span class="operator">=</span> <span class="string">"${escapeHtml(text)}"</span>`,
+    
+    // Pattern 7: Comment style
+    (text, idx) => `<span class="comment"># 🎶 ${escapeHtml(text)}</span>`,
+    
+    // Pattern 8: Dictionary assignment
+    (text, idx) => `<span class="variable">song</span>[<span class="number">${idx + 1}</span>] <span class="operator">=</span> <span class="string">"${escapeHtml(text)}"</span>`,
+    
+    // Pattern 9: Lambda expression
+    (text, idx) => `<span class="variable">line_${idx + 1}</span> <span class="operator">=</span> <span class="keyword">lambda</span>: <span class="string">"${escapeHtml(text)}"</span>`,
+    
+    // Pattern 10: Assert statement
+    (text, idx) => `<span class="keyword">assert</span> <span class="variable">emotion</span>.<span class="function">feel</span>(<span class="string">"${escapeHtml(text)}"</span>)`,
+    
+    // Pattern 11: Async function
+    (text, idx) => `<span class="keyword">async def</span> <span class="function">sing_${idx + 1}</span>(): <span class="keyword">yield</span> <span class="string">"${escapeHtml(text)}"</span>`,
+    
+    // Pattern 12: Try statement with lyric
+    (text, idx) => `<span class="keyword">try</span>: <span class="variable">heart</span>.<span class="function">parse</span>(<span class="string">"${escapeHtml(text)}"</span>)`,
+    
+    // Pattern 13: While loop expression
+    (text, idx) => `<span class="keyword">while</span> <span class="builtin">True</span>: <span class="builtin">print</span>(<span class="string">"${escapeHtml(text)}"</span>)`,
+    
+    // Pattern 14: If statement
+    (text, idx) => `<span class="keyword">if</span> <span class="variable">feeling</span>: <span class="variable">memory</span> <span class="operator">=</span> <span class="string">"${escapeHtml(text)}"</span>`,
+    
+    // Pattern 15: Decorator with function
+    (text, idx) => `<span class="decorator">@emotion</span>\n    <span class="keyword">def</span> <span class="function">feel_${idx + 1}</span>(): <span class="keyword">return</span> <span class="string">"${escapeHtml(text)}"</span>`,
+];
+
 function startLyricsDisplay() {
-    // Initialize line numbers
-    const allLyrics = state.lrcParser ? state.lrcParser.getAllLyrics() : [];
+    // Initialize code content with Python header
+    if (!elements.lineNumbers || !elements.codeContent) return;
     
     elements.lineNumbers.innerHTML = '';
     elements.codeContent.innerHTML = '';
     
-    // Create empty lines for all lyrics
-    for (let i = 1; i <= allLyrics.length; i++) {
+    // Add Python file header comments
+    const headerLines = [
+        '<span class="comment"># -*- coding: utf-8 -*-</span>',
+        '<span class="comment">"""</span>',
+        '<span class="comment">🎵 开始懂了 - 孙燕姿</span>',
+        '<span class="comment">Beginning To Understand</span>',
+        '<span class="comment">词：姚若龙 | 曲：李偲菘</span>',
+        '<span class="comment">"""</span>',
+        '',
+        '<span class="keyword">from</span> <span class="variable">music</span> <span class="keyword">import</span> <span class="class-name">Song</span>, <span class="class-name">Emotion</span>',
+        '<span class="keyword">from</span> <span class="variable">heart</span> <span class="keyword">import</span> <span class="class-name">Memory</span>, <span class="class-name">Feeling</span>',
+        '<span class="keyword">import</span> <span class="variable">asyncio</span>',
+        '',
+        '<span class="variable">lyrics</span> <span class="operator">=</span> []',
+        '<span class="variable">song</span> <span class="operator">=</span> {}',
+        '<span class="variable">emotion</span> <span class="operator">=</span> <span class="class-name">Emotion</span>()',
+        '',
+        '<span class="decorator">@Emotion.feel</span>',
+        '<span class="keyword">def</span> <span class="function">play_song</span>():',
+        '<span class="comment">    """开始播放音乐，感受每一句歌词..."""</span>',
+        ''
+    ];
+    
+    headerLines.forEach((content, idx) => {
         const lineNum = document.createElement('div');
         lineNum.className = 'line-number';
-        lineNum.textContent = i;
+        lineNum.textContent = idx + 1;
         elements.lineNumbers.appendChild(lineNum);
-    }
+        
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'code-line header-line';
+        lineDiv.innerHTML = content || '&nbsp;';
+        elements.codeContent.appendChild(lineDiv);
+    });
     
-    // Start displaying lyrics as they appear
-    updateLyricsDisplay();
+    state.pythonLineIndex = headerLines.length;
 }
 
 function updateLyricsDisplay() {
-    if (!state.lrcParser) return;
+    if (!state.lrcParser || !elements.codeContent) return;
     
     const currentTime = state.currentTime;
     const current = state.lrcParser.getCurrentLyric(currentTime);
@@ -260,25 +361,51 @@ function updateLyricsDisplay() {
     if (current.index !== state.currentLyricIndex) {
         state.currentLyricIndex = current.index;
         
-        // Add the new lyric line
+        // Choose a Python pattern based on the lyric index for variety
+        const patternIndex = current.index % pythonPatterns.length;
+        const pythonCode = pythonPatterns[patternIndex](current.text, current.index);
+        
+        // Add indent (4 spaces) to simulate being inside the function
+        const indent = '    ';
+        
+        // Create line number
+        state.pythonLineIndex++;
+        const lineNum = document.createElement('div');
+        lineNum.className = 'line-number';
+        lineNum.textContent = state.pythonLineIndex;
+        elements.lineNumbers.appendChild(lineNum);
+        
+        // Add the new lyric line as Python code
         const lineDiv = document.createElement('div');
         lineDiv.className = 'code-line typing';
         lineDiv.setAttribute('data-index', current.index);
-        
-        // Style the lyric text
-        lineDiv.innerHTML = `<span class="lyric-text">${escapeHtml(current.text)}</span>`;
+        lineDiv.innerHTML = `<span class="indent">${indent}</span>${pythonCode}`;
         
         elements.codeContent.appendChild(lineDiv);
         
         // Update line/column indicator
-        updateLineCol(current.index + 1, current.text.length);
+        updateLineCol(state.pythonLineIndex, current.text.length + 20);
         
-        // Scroll to bottom
-        elements.codeContent.scrollTop = elements.codeContent.scrollHeight;
+        // Smooth scroll to the new line
+        smoothScrollToBottom();
         
         // Highlight current line
         highlightCurrentLyric(current.index);
     }
+}
+
+// Smooth scroll function
+function smoothScrollToBottom() {
+    if (!elements.codeEditor) return;
+    
+    const codeEditor = elements.codeEditor;
+    const targetScroll = codeEditor.scrollHeight - codeEditor.clientHeight;
+    
+    // Use smooth scrolling
+    codeEditor.scrollTo({
+        top: targetScroll,
+        behavior: 'smooth'
+    });
 }
 
 function highlightCurrentLyric(index) {
@@ -301,6 +428,10 @@ function escapeHtml(text) {
 
 // ==================== Terminal Output Animation ====================
 function startTerminalOutput() {
+    // 防止重复执行
+    if (state.terminalOutputShown) return;
+    state.terminalOutputShown = true;
+    
     terminalOutputs.forEach(output => {
         setTimeout(() => {
             addTerminalLine(output.text, output.type);
@@ -335,18 +466,36 @@ function addTerminalLine(text, type = 'output') {
 
 // ==================== Audio Controls ====================
 function playAudio() {
-    if (!elements.audio) return;
+    if (!elements.audio) {
+        console.error('Audio element not found');
+        return;
+    }
+    
+    console.log('Attempting to play audio...');
+    console.log('Audio src:', elements.audio.src);
+    console.log('Audio readyState:', elements.audio.readyState);
+    
+    // Resume audio context if it's suspended
+    if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+            console.log('Audio context resumed');
+        });
+    }
     
     const playPromise = elements.audio.play();
     
     if (playPromise !== undefined) {
         playPromise.then(() => {
+            console.log('Audio playing successfully');
             state.isPlaying = true;
             updatePlaybackStatus('播放中', '⏸');
+            updatePlayButtonState(true);
             startTerminalOutput();
         }).catch(error => {
-            console.log('播放失败，需要用户交互:', error);
+            console.error('播放失败:', error);
+            addTerminalLine('⚠️ 音频播放失败，请点击播放按钮重试', 'error');
             updatePlaybackStatus('点击播放', '▶');
+            updatePlayButtonState(false);
         });
     }
 }
@@ -358,76 +507,39 @@ function togglePlay() {
         elements.audio.pause();
         state.isPlaying = false;
         updatePlaybackStatus('已暂停', '▶');
+        updatePlayButtonState(false);
     } else {
         playAudio();
     }
 }
 
-function stopPlayback() {
-    if (!elements.audio) return;
+function updatePlayButtonState(isPlaying) {
+    if (!elements.playControlBtn) return;
     
-    elements.audio.pause();
-    elements.audio.currentTime = 0;
-    state.isPlaying = false;
-    state.currentTime = 0;
-    updatePlaybackStatus('已停止', '▶');
-    updateTimeDisplay();
-}
-
-function seekAudio(e) {
-    if (!elements.audio) return;
+    const svg = elements.playControlBtn.querySelector('.play-icon-svg');
+    if (!svg) return;
     
-    const seekTime = (e.target.value / 100) * state.duration;
-    elements.audio.currentTime = seekTime;
-    state.currentTime = seekTime;
-}
-
-function changeVolume(e) {
-    if (!elements.audio) return;
-    
-    const volume = e.target.value / 100;
-    elements.audio.volume = volume;
-    state.volume = volume;
-    
-    // Update volume icon
-    updateVolumeIcon(volume);
-}
-
-function toggleMute() {
-    if (!elements.audio) return;
-    
-    state.isMuted = !state.isMuted;
-    elements.audio.muted = state.isMuted;
-    
-    updateVolumeIcon(state.isMuted ? 0 : state.volume);
-}
-
-function updateVolumeIcon(volume) {
-    if (!elements.volumeIcon) return;
-    
-    if (volume === 0 || state.isMuted) {
-        elements.volumeIcon.textContent = '🔇';
-    } else if (volume < 0.5) {
-        elements.volumeIcon.textContent = '🔉';
+    if (isPlaying) {
+        // Switch to pause icon
+        elements.playControlBtn.classList.add('playing');
+        svg.innerHTML = '<path class="pause-path" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />';
     } else {
-        elements.volumeIcon.textContent = '🔊';
+        // Switch to play icon
+        elements.playControlBtn.classList.remove('playing');
+        svg.innerHTML = '<path class="play-path" d="M8 5v14l11-7z" />';
     }
 }
 
 // ==================== Audio Event Handlers ====================
 function onAudioLoaded() {
     state.duration = elements.audio.duration;
+    console.log('Audio loaded, duration:', state.duration);
     updateTimeDisplay();
+    addTerminalLine('✅ 音频文件加载完成', 'success');
 }
 
 function onTimeUpdate() {
     state.currentTime = elements.audio.currentTime;
-    
-    // Update progress bar
-    const progress = (state.currentTime / state.duration) * 100;
-    if (elements.progressBar) {
-        elements.progressBar.value = progress;
-    }
     
     // Update lyrics display
     updateLyricsDisplay();
@@ -438,15 +550,35 @@ function onTimeUpdate() {
 function onAudioEnded() {
     state.isPlaying = false;
     updatePlaybackStatus('播放完成', '▶');
+    updatePlayButtonState(false);
+    addTerminalLine('🎵 播放结束', 'success');
 }
 
 function onAudioError(e) {
     console.error('音频加载错误:', e);
-    updatePlaybackStatus('音频未找到', '▶');
+    console.error('Audio error details:', elements.audio.error);
+    updatePlaybackStatus('音频加载失败', '▶');
     
     // Show helpful message in terminal
-    addTerminalLine('⚠️  未找到音频文件，请将您的音频文件放入 assets/audio/ 目录', 'error');
-    addTerminalLine('支持的格式: .wav, .mp3, .ogg', 'output');
+    addTerminalLine('❌ 音频文件加载失败', 'error');
+    if (elements.audio.error) {
+        addTerminalLine(`错误代码: ${elements.audio.error.code}`, 'error');
+        switch(elements.audio.error.code) {
+            case 1:
+                addTerminalLine('错误: 音频加载被中止', 'error');
+                break;
+            case 2:
+                addTerminalLine('错误: 网络错误，无法加载音频', 'error');
+                break;
+            case 3:
+                addTerminalLine('错误: 音频解码失败', 'error');
+                break;
+            case 4:
+                addTerminalLine('错误: 不支持的音频格式或文件未找到', 'error');
+                break;
+        }
+    }
+    addTerminalLine('💡 请确保 music.mp3 文件存在于 assets/audio/ 目录', 'output');
 }
 
 // ==================== UI Updates ====================
@@ -458,11 +590,6 @@ function updatePlaybackStatus(text, icon) {
     
     if (iconElement) iconElement.textContent = icon;
     if (textElement) textElement.textContent = text;
-    
-    if (elements.playBtn) {
-        const playIcon = elements.playBtn.querySelector('.play-icon');
-        if (playIcon) playIcon.textContent = icon;
-    }
 }
 
 function updateTimeDisplay() {
@@ -502,31 +629,6 @@ function toggleTheme() {
     }
 }
 
-// ==================== Fullscreen ====================
-function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().then(() => {
-            state.isFullscreen = true;
-            if (elements.fullscreenBtn) {
-                elements.fullscreenBtn.querySelector('.fullscreen-icon').textContent = '⛶';
-            }
-        }).catch(err => {
-            console.error('无法进入全屏:', err);
-        });
-    } else {
-        document.exitFullscreen().then(() => {
-            state.isFullscreen = false;
-            if (elements.fullscreenBtn) {
-                elements.fullscreenBtn.querySelector('.fullscreen-icon').textContent = '⛶';
-            }
-        });
-    }
-}
-
-function onFullscreenChange() {
-    state.isFullscreen = !!document.fullscreenElement;
-}
-
 // ==================== Terminal Controls ====================
 function clearTerminal() {
     if (elements.terminalContent) {
@@ -555,34 +657,17 @@ function toggleTerminalPanel() {
 
 // ==================== Keyboard Shortcuts ====================
 function handleKeyPress(e) {
-    // Space - Play/Pause
+    // Space - Play/Pause or Open VS Code
     if (e.code === 'Space' && !e.target.matches('input, textarea')) {
         e.preventDefault();
-        if (state.isInitialized) {
-            if (elements.launchScreen && !elements.launchScreen.classList.contains('hidden')) {
-                startExperience();
-            } else {
-                togglePlay();
+        if (elements.launchScreen && !elements.launchScreen.classList.contains('hidden')) {
+            // If on launch screen, open VS Code
+            if (!state.windowOpened) {
+                openVSCodeWindow();
             }
+        } else if (state.isPlaying !== undefined) {
+            togglePlay();
         }
-    }
-    
-    // Escape - Stop
-    if (e.code === 'Escape') {
-        e.preventDefault();
-        stopPlayback();
-    }
-    
-    // M - Mute
-    if (e.code === 'KeyM' && !e.target.matches('input, textarea')) {
-        e.preventDefault();
-        toggleMute();
-    }
-    
-    // F11 - Fullscreen (browser default, but we track it)
-    if (e.code === 'F11') {
-        e.preventDefault();
-        toggleFullscreen();
     }
     
     // Arrow Left - Rewind 5 seconds
@@ -681,59 +766,54 @@ function initParticles() {
     });
 }
 
-// ==================== Matrix Rain Effect ====================
-function initMatrixRain() {
-    const canvas = elements.matrixCanvas;
-    if (!canvas) return;
-    
-    state.matrixRain = new MatrixRain(canvas);
-    
-    // Start matrix rain after a delay
-    setTimeout(() => {
-        if (elements.matrixCanvas) {
-            elements.matrixCanvas.classList.add('active');
-            state.matrixRain.start();
-        }
-    }, 3000);
-}
-
 // ==================== Audio Visualizer ====================
+let audioContext = null;
+let analyser = null;
+let dataArray = null;
+let bufferLength = 0;
+
 function initAudioVisualizer() {
     const canvas = elements.audioVisualizer;
-    if (!canvas) return;
+    if (!canvas) {
+        console.log('Canvas not found');
+        return;
+    }
     
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = 150;
     
-    let audioContext, analyser, dataArray, bufferLength;
-    
-    // Try to initialize Web Audio API
-    try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        const source = audioContext.createMediaElementSource(elements.audio);
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        
-        analyser.fftSize = 256;
-        bufferLength = analyser.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-    } catch (e) {
-        console.log('Web Audio API not supported:', e);
-        // Fallback to simple wave animation
-        drawSimpleWave();
-        return;
+    // Only initialize Web Audio API once
+    if (!audioContext) {
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaElementSource(elements.audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            
+            analyser.fftSize = 256;
+            bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+            
+            console.log('Audio visualizer initialized successfully');
+        } catch (e) {
+            console.error('Web Audio API initialization failed:', e);
+            return;
+        }
     }
     
     function draw() {
         requestAnimationFrame(draw);
         
-        if (!state.isPlaying) return;
+        if (!analyser || !dataArray) return;
         
         analyser.getByteFrequencyData(dataArray);
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Only draw if playing
+        if (!state.isPlaying) return;
         
         const barWidth = (canvas.width / bufferLength) * 2.5;
         let barHeight;
@@ -754,33 +834,6 @@ function initAudioVisualizer() {
     }
     
     draw();
-    
-    function drawSimpleWave() {
-        let offset = 0;
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            if (!state.isPlaying) return;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height / 2);
-            
-            for (let x = 0; x < canvas.width; x += 5) {
-                const y = canvas.height / 2 + Math.sin((x + offset) * 0.02) * 30;
-                ctx.lineTo(x, y);
-            }
-            
-            ctx.strokeStyle = 'rgba(0, 122, 204, 0.6)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            offset += 2;
-        }
-        
-        animate();
-    }
     
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
