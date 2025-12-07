@@ -12,120 +12,26 @@ const state = {
     isMuted: false,
     isFullscreen: false,
     isDarkTheme: true,
-    codeTypingIndex: 0,
-    currentLineIndex: 0,
-    isInitialized: false
+    currentLyricIndex: -1,
+    isInitialized: false,
+    lrcParser: null,
+    matrixRain: null
 };
 
-// ==================== Python Code Content ====================
-const pythonCode = `# -*- coding: utf-8 -*-
-"""
-一个关于代码与梦想的故事
-A Story About Code and Dreams
-"""
-
-import time
-import love
-from heart import Heart, Dream
-from typing import List
-
-class 梦想家:
-    """追逐梦想的人"""
-    
-    def __init__(self, name: str):
-        self.name = name
-        self.dreams: List[Dream] = []
-        self.heart = Heart()
-        print(f"你好，我是 {self.name}")
-    
-    def 追逐(self, dream: str) -> str:
-        """追逐一个新的梦想"""
-        new_dream = Dream(dream)
-        print(f"✨ 正在追逐: {dream}")
-        self.dreams.append(new_dream)
-        self.heart.beat()
-        return "永不放弃"
-    
-    def 坚持(self, days: int = 365):
-        """坚持追梦的日子"""
-        for day in range(1, days + 1):
-            if day % 100 == 0:
-                print(f"第 {day} 天，依然在路上...")
-            time.sleep(0.001)
-        return "梦想成真"
-
-class 世界:
-    """这个世界充满可能"""
-    
-    @staticmethod
-    def execute(me: 梦想家):
-        """执行梦想"""
-        print("🌍 world.execute(me);")
-        print("正在加载梦想引擎...")
-        
-        # 开始追梦之旅
-        me.追逐("创造美好的代码")
-        me.追逐("用技术改变世界")
-        me.追逐("让生活充满诗意")
-        
-        # 坚持不懈
-        result = me.坚持(365)
-        print(f"💫 {result}")
-        
-        return True
-
-def main():
-    """主程序：一个关于追梦的故事"""
-    print("=" * 50)
-    print("世界，执行我！")
-    print("=" * 50)
-    
-    # 创建一个梦想家
-    我 = 梦想家("程序员")
-    
-    # 世界执行我
-    世界.execute(我)
-    
-    # 永不停止
-    while True:
-        print("💭 梦想永不停歇...")
-        time.sleep(1)
-        
-        # 除非...
-        if 我.heart.is_fulfilled():
-            break
-    
-    print("🎵 世界，感谢你执行了我的梦想")
-    print("✨ 这只是开始，不是结束")
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\\n👋 再见，继续追梦！")
-    except Exception as e:
-        print(f"❌ 错误: {e}")
-        print("但是，梦想永不停止！")
-`;
+// ==================== Lyrics Data ====================
+// Will be loaded from lyrics.lrc file
 
 // ==================== Terminal Output Timeline ====================
 const terminalOutputs = [
-    { time: 0, text: ">>> python Sunyz.py", type: "prompt" },
+    { time: 0, text: ">>> 正在播放: 开始懂了 - 孙燕姿", type: "prompt" },
     { time: 2, text: "=" + "=".repeat(48), type: "output" },
-    { time: 2.5, text: "世界，执行我！", type: "output" },
+    { time: 2.5, text: "🎵 Beginning To Understand", type: "output" },
     { time: 3, text: "=" + "=".repeat(48), type: "output" },
-    { time: 4, text: "你好，我是 程序员", type: "output" },
-    { time: 6, text: "🌍 开始懂了;", type: "success" },
-    { time: 7, text: "正在加载梦想引擎...", type: "output" },
-    { time: 9, text: "✨ 正在追逐: 创造美好的代码", type: "success" },
-    { time: 12, text: "✨ 正在追逐: 用技术改变世界", type: "success" },
-    { time: 15, text: "✨ 正在追逐: 让生活充满诗意", type: "success" },
-    { time: 18, text: "第 100 天，依然在路上...", type: "output" },
-    { time: 21, text: "💫 梦想成真", type: "success" },
-    { time: 24, text: "💭 梦想永不停歇...", type: "output" },
-    { time: 27, text: "💭 梦想永不停歇...", type: "output" },
-    { time: 30, text: "🎵 世界，感谢你执行了我的梦想", type: "success" },
-    { time: 33, text: "✨ 这只是开始，不是结束", type: "success" }
+    { time: 4, text: "词：姚若龙", type: "output" },
+    { time: 6, text: "曲：李偲菘", type: "success" },
+    { time: 7, text: "正在同步歌词...", type: "output" },
+    { time: 9, text: "✨ 歌词已加载", type: "success" },
+    { time: 12, text: "🎵 开始播放", type: "success" }
 ];
 
 // ==================== DOM Elements ====================
@@ -178,8 +84,11 @@ function init() {
     
     // Initialize visual effects
     initParticles();
-    initMatrix();
+    initMatrixRain();
     initAudioVisualizer();
+    
+    // Load lyrics
+    loadLyrics();
 }
 
 // ==================== Loading Animation ====================
@@ -267,6 +176,28 @@ function setupEventListeners() {
     document.addEventListener('fullscreenchange', onFullscreenChange);
 }
 
+// ==================== Load Lyrics ====================
+async function loadLyrics() {
+    try {
+        state.lrcParser = new LRCParser();
+        await state.lrcParser.loadFromFile('assets/audio/lyrics.lrc');
+        
+        const metadata = state.lrcParser.getMetadata();
+        console.log('Lyrics loaded:', metadata);
+        
+        // Display metadata in terminal
+        if (metadata.ti) {
+            addTerminalLine(`🎵 歌曲: ${metadata.ti}`, 'success');
+        }
+        if (metadata.ar) {
+            addTerminalLine(`🎤 歌手: ${metadata.ar}`, 'output');
+        }
+    } catch (error) {
+        console.error('Failed to load lyrics:', error);
+        addTerminalLine('⚠️ 歌词加载失败', 'error');
+    }
+}
+
 // ==================== Start Experience ====================
 function startExperience() {
     if (!state.isInitialized) return;
@@ -284,8 +215,8 @@ function startExperience() {
         }
     }, 1000);
     
-    // Start code typing animation
-    startCodeTyping();
+    // Start lyrics display
+    startLyricsDisplay();
     
     // Try to play audio (may require user interaction)
     setTimeout(() => {
@@ -293,107 +224,75 @@ function startExperience() {
     }, 2000);
 }
 
-// ==================== Code Typing Animation ====================
-function startCodeTyping() {
-    const lines = pythonCode.split('\n');
+// ==================== Lyrics Display ====================
+function startLyricsDisplay() {
+    // Initialize line numbers
+    const allLyrics = state.lrcParser ? state.lrcParser.getAllLyrics() : [];
     
-    // Generate line numbers
-    for (let i = 1; i <= lines.length; i++) {
+    elements.lineNumbers.innerHTML = '';
+    elements.codeContent.innerHTML = '';
+    
+    // Create empty lines for all lyrics
+    for (let i = 1; i <= allLyrics.length; i++) {
         const lineNum = document.createElement('div');
         lineNum.className = 'line-number';
         lineNum.textContent = i;
         elements.lineNumbers.appendChild(lineNum);
     }
     
-    // Type each line with animation
-    let currentLine = 0;
+    // Start displaying lyrics as they appear
+    updateLyricsDisplay();
+}
+
+function updateLyricsDisplay() {
+    if (!state.lrcParser) return;
     
-    function typeNextLine() {
-        if (currentLine >= lines.length) {
-            // Enable matrix effect when typing is done
-            if (elements.matrixCanvas) {
-                elements.matrixCanvas.classList.add('active');
-            }
-            return;
-        }
+    const currentTime = state.currentTime;
+    const current = state.lrcParser.getCurrentLyric(currentTime);
+    
+    if (!current) return;
+    
+    // Check if we need to add a new line
+    if (current.index !== state.currentLyricIndex) {
+        state.currentLyricIndex = current.index;
         
-        const line = lines[currentLine];
+        // Add the new lyric line
         const lineDiv = document.createElement('div');
         lineDiv.className = 'code-line typing';
+        lineDiv.setAttribute('data-index', current.index);
         
-        // Apply syntax highlighting
-        lineDiv.innerHTML = highlightSyntax(line);
+        // Style the lyric text
+        lineDiv.innerHTML = `<span class="lyric-text">${escapeHtml(current.text)}</span>`;
         
         elements.codeContent.appendChild(lineDiv);
         
         // Update line/column indicator
-        state.currentLineIndex = currentLine + 1;
-        updateLineCol(currentLine + 1, line.length + 1);
+        updateLineCol(current.index + 1, current.text.length);
         
         // Scroll to bottom
         elements.codeContent.scrollTop = elements.codeContent.scrollHeight;
         
-        currentLine++;
-        
-        // Calculate delay based on line length and audio playback
-        const baseDelay = 50 + Math.random() * 100;
-        const lineDelay = Math.min(baseDelay + line.length * 5, 500);
-        
-        setTimeout(typeNextLine, lineDelay);
+        // Highlight current line
+        highlightCurrentLyric(current.index);
     }
-    
-    typeNextLine();
 }
 
-// ==================== Syntax Highlighting ====================
-function highlightSyntax(code) {
-    // Python keywords (excluding def and class which are handled specially)
-    const keywords = ['import', 'from', 'return', 'if', 'elif', 'else', 
-                     'for', 'while', 'in', 'try', 'except', 'finally', 'with', 'as', 
-                     'break', 'continue', 'pass', 'raise', 'yield', 'lambda', 'True', 
-                     'False', 'None', 'and', 'or', 'not', 'is'];
+function highlightCurrentLyric(index) {
+    // Remove previous highlights
+    const allLines = elements.codeContent.querySelectorAll('.code-line');
+    allLines.forEach(line => line.classList.remove('active'));
     
-    const builtins = ['print', 'len', 'range', 'str', 'int', 'float', 'list', 'dict', 
-                     'set', 'tuple', 'type', 'isinstance', 'enumerate', 'zip', 'map', 
-                     'filter', 'open', 'time'];
-    
-    // Escape HTML first
-    code = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    
-    // Process in order: comments and strings first (to avoid processing their contents)
-    // Comments
-    code = code.replace(/(#.*$)/gm, '<span class="comment">$1</span>');
-    
-    // Strings (double and single quotes, including docstrings)
-    code = code.replace(/"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, 
-                       match => `<span class="string">${match}</span>`);
-    
-    // Decorators
-    code = code.replace(/(@\w+)/g, '<span class="decorator">$1</span>');
-    
-    // Class definitions with names (def and class keywords get highlighted here)
-    code = code.replace(/\bclass\s+(\w+)/g, '<span class="keyword">class</span> <span class="class-name">$1</span>');
-    
-    // Function definitions with names
-    code = code.replace(/\bdef\s+(\w+)/g, '<span class="keyword">def</span> <span class="function">$1</span>');
-    
-    // Other keywords (avoiding already-wrapped content by using negative lookbehind for span)
-    keywords.forEach(keyword => {
-        // Use a more specific pattern that avoids matching inside already-highlighted content
-        const regex = new RegExp(`(?<!<span[^>]*>)\\b${keyword}\\b(?![^<]*</span>)`, 'g');
-        code = code.replace(regex, `<span class="keyword">${keyword}</span>`);
-    });
-    
-    // Builtins
-    builtins.forEach(builtin => {
-        const regex = new RegExp(`(?<!<span[^>]*>)\\b${builtin}\\b(?![^<]*</span>)`, 'g');
-        code = code.replace(regex, `<span class="builtin">${builtin}</span>`);
-    });
-    
-    // Numbers
-    code = code.replace(/(?<!<span[^>]*>)\b(\d+)\b(?![^<]*<\/span>)/g, '<span class="number">$1</span>');
-    
-    return code;
+    // Highlight current line
+    const currentLine = elements.codeContent.querySelector(`[data-index="${index}"]`);
+    if (currentLine) {
+        currentLine.classList.add('active');
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ==================== Terminal Output Animation ====================
@@ -525,6 +424,9 @@ function onTimeUpdate() {
     if (elements.progressBar) {
         elements.progressBar.value = progress;
     }
+    
+    // Update lyrics display
+    updateLyricsDisplay();
     
     updateTimeDisplay();
 }
@@ -776,43 +678,19 @@ function initParticles() {
 }
 
 // ==================== Matrix Rain Effect ====================
-function initMatrix() {
+function initMatrixRain() {
     const canvas = elements.matrixCanvas;
     if (!canvas) return;
     
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    state.matrixRain = new MatrixRain(canvas);
     
-    const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンabcdefghijklmnopqrstuvwxyz';
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-    
-    function draw() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = '#0F0';
-        ctx.font = fontSize + 'px monospace';
-        
-        for (let i = 0; i < drops.length; i++) {
-            const text = chars[Math.floor(Math.random() * chars.length)];
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            
-            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                drops[i] = 0;
-            }
-            drops[i]++;
+    // Start matrix rain after a delay
+    setTimeout(() => {
+        if (elements.matrixCanvas) {
+            elements.matrixCanvas.classList.add('active');
+            state.matrixRain.start();
         }
-    }
-    
-    setInterval(draw, 33);
-    
-    window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    });
+    }, 3000);
 }
 
 // ==================== Audio Visualizer ====================

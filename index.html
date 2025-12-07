@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>world.execute(me); - VS Code</title>
+    <title>开始懂了 - 孙燕姿 - VS Code</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -23,8 +23,8 @@
                     <path fill="#1f9cf0" d="M35 45L15 30 5 35v30l10 5 20-15z" />
                 </svg>
             </div>
-            <h1 class="launch-title">world.execute(me);</h1>
-            <p class="launch-subtitle">A love story told in Python</p>
+            <h1 class="launch-title">开始懂了</h1>
+            <p class="launch-subtitle">孙燕姿 - Beginning To Understand</p>
             <div class="loading-container">
                 <div class="loading-bar">
                     <div class="loading-progress" id="loading-progress"></div>
@@ -48,12 +48,15 @@
                 </div>
                 <span class="titlebar-menu">File</span>
                 <span class="titlebar-menu">Edit</span>
+                <span class="titlebar-menu">Selection</span>
                 <span class="titlebar-menu">View</span>
+                <span class="titlebar-menu">Go</span>
                 <span class="titlebar-menu">Run</span>
+                <span class="titlebar-menu">Terminal</span>
                 <span class="titlebar-menu">Help</span>
             </div>
             <div class="titlebar-center">
-                <span>world_execute_me.py - Web-Music - Visual Studio Code</span>
+                <span>lyrics.lrc - Web-Music - Visual Studio Code</span>
             </div>
             <div class="titlebar-right">
                 <button class="titlebar-btn minimize">─</button>
@@ -118,35 +121,35 @@
                     <div class="file-tree">
                         <div class="tree-item folder open">
                             <span class="tree-icon">📁</span>
-                            <span class="tree-name">src</span>
+                            <span class="tree-name">assets</span>
                         </div>
-                        <div class="tree-item file active" style="padding-left: 24px;">
-                            <span class="tree-icon">🐍</span>
-                            <span class="tree-name">world_execute_me.py</span>
+                        <div class="tree-item folder open" style="padding-left: 24px;">
+                            <span class="tree-icon">📁</span>
+                            <span class="tree-name">audio</span>
                         </div>
-                        <div class="tree-item file" style="padding-left: 24px;">
-                            <span class="tree-icon">🐍</span>
-                            <span class="tree-name">love.py</span>
+                        <div class="tree-item file active" style="padding-left: 48px;">
+                            <span class="tree-icon">🎵</span>
+                            <span class="tree-name">lyrics.lrc</span>
                         </div>
-                        <div class="tree-item file" style="padding-left: 24px;">
-                            <span class="tree-icon">🐍</span>
-                            <span class="tree-name">heart.py</span>
+                        <div class="tree-item file" style="padding-left: 48px;">
+                            <span class="tree-icon">🎵</span>
+                            <span class="tree-name">music.mp3</span>
                         </div>
                         <div class="tree-item folder">
                             <span class="tree-icon">📁</span>
-                            <span class="tree-name">assets</span>
+                            <span class="tree-name">css</span>
                         </div>
-                        <div class="tree-item file" style="padding-left: 24px;">
-                            <span class="tree-icon">🎵</span>
-                            <span class="tree-name">world_execute_me.wav</span>
+                        <div class="tree-item folder">
+                            <span class="tree-icon">📁</span>
+                            <span class="tree-name">js</span>
+                        </div>
+                        <div class="tree-item file">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-name">index.html</span>
                         </div>
                         <div class="tree-item file">
                             <span class="tree-icon">📄</span>
                             <span class="tree-name">README.md</span>
-                        </div>
-                        <div class="tree-item file">
-                            <span class="tree-icon">⚙️</span>
-                            <span class="tree-name">requirements.txt</span>
                         </div>
                     </div>
                 </div>
@@ -157,24 +160,19 @@
                 <!-- 标签页 -->
                 <div class="tabs-bar">
                     <div class="tab active">
-                        <span class="tab-icon">🐍</span>
-                        <span class="tab-name">world_execute_me.py</span>
-                        <span class="tab-close">×</span>
-                    </div>
-                    <div class="tab">
-                        <span class="tab-icon">🐍</span>
-                        <span class="tab-name">love.py</span>
+                        <span class="tab-icon">🎵</span>
+                        <span class="tab-name">lyrics.lrc</span>
                         <span class="tab-close">×</span>
                     </div>
                 </div>
 
                 <!-- 面包屑 -->
                 <div class="breadcrumbs">
-                    <span class="breadcrumb">src</span>
+                    <span class="breadcrumb">assets</span>
                     <span class="breadcrumb-separator">›</span>
-                    <span class="breadcrumb">world_execute_me.py</span>
+                    <span class="breadcrumb">audio</span>
                     <span class="breadcrumb-separator">›</span>
-                    <span class="breadcrumb symbol">World</span>
+                    <span class="breadcrumb">lyrics.lrc</span>
                 </div>
 
                 <!-- 代码编辑器 -->
@@ -239,7 +237,7 @@
                 <span class="status-item spaces">Spaces: 4</span>
                 <span class="status-item encoding">UTF-8</span>
                 <span class="status-item eol">LF</span>
-                <span class="status-item language">Python</span>
+                <span class="status-item language">LRC</span>
                 <span class="status-item theme-toggle" id="theme-toggle">🌙</span>
             </div>
         </div>
@@ -272,13 +270,14 @@
 
     <!-- 音频元素 -->
     <audio id="audio" preload="auto" crossorigin="anonymous">
-        <source src="assets/audio/world_execute_me.wav" type="audio/wav">
         <source src="assets/audio/music.mp3" type="audio/mpeg">
     </audio>
 
     <!-- Matrix 代码雨背景 -->
     <canvas id="matrix-canvas" class="matrix-canvas"></canvas>
 
+    <script src="js/lrc-parser.js"></script>
+    <script src="js/matrix-rain.js"></script>
     <script src="js/main.js"></script>
 </body>
 
