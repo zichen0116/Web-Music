@@ -296,7 +296,6 @@ function startExperience() {
 // ==================== Code Typing Animation ====================
 function startCodeTyping() {
     const lines = pythonCode.split('\n');
-    const codeLines = [];
     
     // Generate line numbers
     for (let i = 1; i <= lines.length; i++) {
@@ -371,7 +370,13 @@ function highlightSyntax(code) {
     // Decorators
     code = code.replace(/(@\w+)/g, '<span class="decorator">$1</span>');
     
-    // Keywords
+    // Class names (capture words after 'class' keyword, before they're wrapped)
+    code = code.replace(/\bclass\s+(\w+)/g, 'class <span class="class-name">$1</span>');
+    
+    // Function names (capture words after 'def' keyword, before they're wrapped)
+    code = code.replace(/\bdef\s+(\w+)/g, 'def <span class="function">$1</span>');
+    
+    // Keywords (must be after class/function name extraction to avoid double-wrapping)
     keywords.forEach(keyword => {
         const regex = new RegExp(`\\b${keyword}\\b`, 'g');
         code = code.replace(regex, `<span class="keyword">${keyword}</span>`);
@@ -382,14 +387,6 @@ function highlightSyntax(code) {
         const regex = new RegExp(`\\b${builtin}\\b`, 'g');
         code = code.replace(regex, `<span class="builtin">${builtin}</span>`);
     });
-    
-    // Class names (words after 'class' keyword)
-    code = code.replace(/class\s+<span class="keyword">class<\/span>\s+(\w+)/g, 
-                       'class <span class="keyword">class</span> <span class="class-name">$1</span>');
-    
-    // Function names (words after 'def' keyword)
-    code = code.replace(/def\s+<span class="keyword">def<\/span>\s+(\w+)/g, 
-                       'def <span class="keyword">def</span> <span class="function">$1</span>');
     
     // Numbers
     code = code.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');

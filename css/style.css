@@ -559,15 +559,6 @@ body {
     50% { opacity: 0.8; }
 }
 
-/* Minimap */
-.minimap {
-    width: 80px;
-    background: var(--bg-secondary);
-    border-left: 1px solid var(--border-color);
-    position: relative;
-    overflow: hidden;
-}
-
 /* ==================== Terminal Panel ==================== */
 .terminal-panel {
     height: 200px;
