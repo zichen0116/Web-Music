@@ -124,8 +124,3 @@ class MatrixRain {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }
-
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = MatrixRain;
-}

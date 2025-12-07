@@ -194,7 +194,11 @@ async function loadLyrics() {
         }
     } catch (error) {
         console.error('Failed to load lyrics:', error);
-        addTerminalLine('⚠️ 歌词加载失败', 'error');
+        if (error.message && error.message.includes('fetch')) {
+            addTerminalLine('⚠️ 无法加载歌词文件，请检查文件路径', 'error');
+        } else {
+            addTerminalLine('⚠️ 歌词文件格式错误', 'error');
+        }
     }
 }
 
